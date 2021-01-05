@@ -1,0 +1,12 @@
+Source: hyperpixel4-blu
+Maintainer: Santeri Toikka <santeri.toikka@iki.fi>
+Section: misc
+Priority: optional
+Rules-Requires-Root: binary-targets
+Standards-Version: 3.9.2
+Build-Depends: python3 (>= 3.7)
+
+Package: hyperpixel4-blu
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: hyperpixel4 backlight utilities for Raspberry Pi

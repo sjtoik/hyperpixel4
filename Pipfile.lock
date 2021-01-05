@@ -1,11 +1,11 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "1b6b32ea33964e3c39389e18475c3fc1772028c6c426db2f30d248e884709922"
+            "sha256": "ec451df09af8250d4d4b5c7c377727cea989cd0114135c6193cc46d461ae57ad"
         },
         "pipfile-spec": 6,
         "requires": {
-            "python_version": "3.8"
+            "python_version": "3.7"
         },
         "sources": [
             {
@@ -30,13 +30,6 @@
             ],
             "index": "pypi",
             "version": "==1.5.1"
-        },
-        "rpi.gpio": {
-            "hashes": [
-                "sha256:7424bc6c205466764f30f666c18187a0824077daf20b295c42f08aea2cb87d3f"
-            ],
-            "index": "pypi",
-            "version": "==0.7.0"
         }
     },
     "develop": {}

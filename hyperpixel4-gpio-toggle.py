@@ -9,5 +9,5 @@
 
 import gpiozero
 
-power_toggle = gpiozero.GPIODevice(pin=19)
-power_toggle.value
+screen_backlight = gpiozero.OutputDevice(pin=19)
+screen_backlight.toggle()

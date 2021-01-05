@@ -1,0 +1,45 @@
+#!/usr/bin/python3
+import RPi.GPIO
+
+"""
+command line testing
+$ raspi-gpio set 19 op dl
+$ raspi-gpio set 19 op dh
+
+pi@pascal:~ $ DISPLAY=:0 xscreensaver-command -watch
+UNBLANK Sun Oct  4 14:48:25 2020
+BLANK Sun Oct  4 14:48:37 2020
+UNBLANK Sun Oct  4 14:48:47 2020
+"""
+
+
+def init():
+    RPi.GPIO.setmode(RPi.GPIO.BCM)
+    RPi.GPIO.setwarnings(False)
+    RPi.GPIO.setup(19, RPi.GPIO.OUT)
+
+
+def low_level_on():
+    init()
+    RPi.GPIO.output(19, RPi.GPIO.HIHG)
+
+
+def low_level_off():
+    init()
+    RPi.GPIO.output(19, RPi.GPIO.LOW)
+
+
+def low_level_toggle():
+    init()
+    RPi.GPIO.output(19, not RPi.GPIO.input(19))
+
+
+def not_working():
+    import gpiozero
+    screen_backlight = gpiozero.OutputDevice(pin=19, active_high=True, initial_value=None)
+    screen_backlight.toggle()
+    # this calls cleanup which restores the state after the execution is done and class is removed from memory
+    screen_backlight.close()
+
+
+low_level_toggle()

@@ -1,5 +1,12 @@
 #!/usr/bin/python3
-import RPi.GPIO
+try:
+    import RPi.GPIO
+except ModuleNotFoundError:
+    pass
+import argparse
+import os.path
+import logging
+import subprocess
 
 """
 command line testing
@@ -8,8 +15,10 @@ $ raspi-gpio set 19 op dh
 
 pi@pascal:~ $ DISPLAY=:0 xscreensaver-command -watch
 UNBLANK Sun Oct  4 14:48:25 2020
+
 BLANK Sun Oct  4 14:48:37 2020
-UNBLANK Sun Oct  4 14:48:47 2020
+...or
+LOCK Tue Jan  5 14:16:38 2021
 """
 
 
@@ -19,17 +28,17 @@ def init():
     RPi.GPIO.setup(19, RPi.GPIO.OUT)
 
 
-def low_level_on():
+def on():
     init()
     RPi.GPIO.output(19, RPi.GPIO.HIHG)
 
 
-def low_level_off():
+def off():
     init()
     RPi.GPIO.output(19, RPi.GPIO.LOW)
 
 
-def low_level_toggle():
+def toggle():
     init()
     RPi.GPIO.output(19, not RPi.GPIO.input(19))
 
@@ -42,4 +51,38 @@ def not_working():
     screen_backlight.close()
 
 
-low_level_toggle()
+def daemon():
+    logging.info('Starting to listen events in XScreenSaver')
+    #  with subprocess.Popen(['xscreensaver-command', '-watch']) as p:
+    with subprocess.Popen(['ls', '-l'], stdout=subprocess.PIPE) as p:
+        while True:
+            line = p.stdout.readline().decode('utf-8')
+            if not line:
+                break
+            logging.debug(line.strip())
+
+
+if __name__ == '__main__':
+    """
+    Parses command line input and starts up a daemon process, or executes a user action.
+    """
+    app_name = os.path.basename(__file__)
+    parser = argparse.ArgumentParser(prog=app_name, description='Control the hyperpixel4 backlight.')
+    parser.add_argument('action', choices=['on', 'off', 'daemon'], default=None)
+    parser.add_argument('--debug', required=False, action='store_true')
+    args = parser.parse_args()
+
+    if args.debug:
+        logging.basicConfig(level=logging.DEBUG)
+    else:
+        logging.basicConfig(level=logging.INFO)
+    logging.getLogger().handlers[0].setFormatter(
+        logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+    )
+
+    if args.action == 'on':
+        on()
+    elif args.action == 'off':
+        off()
+    elif args.action == 'daemon':
+        daemon()

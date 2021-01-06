@@ -58,8 +58,8 @@ def not_working():
 def daemon():
     logging.info('Starting to listen events in XScreenSaver')
     with subprocess.Popen(['xscreensaver-command', '-watch'], stdout=subprocess.PIPE) as p:
-        unblank = re.compile('^UNBLANK.*')
-        blank = re.compile('^(BLANK|LOCK)+.*]')
+        unblank = r'^UNBLANK.*'
+        blank = r'^(BLANK|LOCK)+'
         while True:
             line = p.stdout.readline().decode('utf-8')
             if not line:
@@ -94,8 +94,8 @@ class TestImplementation(unittest.TestCase):
         mock_on = self.create_patch('__main__.on')
 
         daemon()
-        assert mock_on.called == 1
-        assert mock_off.called == 2
+        assert mock_on.call_count == 1
+        assert mock_off.call_count == 2
 
 
 if __name__ == '__main__':

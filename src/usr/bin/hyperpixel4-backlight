@@ -7,6 +7,10 @@ import argparse
 import os.path
 import logging
 import subprocess
+import re
+import unittest
+import unittest.mock
+import sys
 
 """
 command line testing
@@ -53,13 +57,45 @@ def not_working():
 
 def daemon():
     logging.info('Starting to listen events in XScreenSaver')
-    #  with subprocess.Popen(['xscreensaver-command', '-watch']) as p:
-    with subprocess.Popen(['ls', '-l'], stdout=subprocess.PIPE) as p:
+    with subprocess.Popen(['xscreensaver-command', '-watch'], stdout=subprocess.PIPE) as p:
+        unblank = re.compile('^UNBLANK.*')
+        blank = re.compile('^(BLANK|LOCK)+.*]')
         while True:
             line = p.stdout.readline().decode('utf-8')
             if not line:
                 break
+
             logging.debug(line.strip())
+            if re.match(blank, line):
+                off()
+            elif re.match(unblank, line):
+                on()
+
+
+class TestImplementation(unittest.TestCase):
+
+    def create_patch(self, name):
+         patcher = unittest.mock.patch(name)
+         thing = patcher.start()
+         self.addCleanup(patcher.stop)
+         return thing
+
+    def test_grepping(self):
+        readline_tests = [
+            b'UNBLANK Sun Oct  4 14:48:25 2020',
+            b'BLANK Sun Oct  4 14:48:37 2020',
+            b'LOCK Tue Jan  5 14:16:38 2021',
+            b'',
+        ]
+
+        mock_popen = self.create_patch('subprocess.Popen')
+        mock_popen.return_value.__enter__.return_value.stdout.readline.side_effect = readline_tests
+        mock_off = self.create_patch('__main__.off')
+        mock_on = self.create_patch('__main__.on')
+
+        daemon()
+        assert mock_on.called == 1
+        assert mock_off.called == 2
 
 
 if __name__ == '__main__':
@@ -68,7 +104,7 @@ if __name__ == '__main__':
     """
     app_name = os.path.basename(__file__)
     parser = argparse.ArgumentParser(prog=app_name, description='Control the hyperpixel4 backlight.')
-    parser.add_argument('action', choices=['on', 'off', 'daemon'], default=None)
+    parser.add_argument('action', choices=['on', 'off', 'daemon', 'test'], default=None)
     parser.add_argument('--debug', required=False, action='store_true')
     args = parser.parse_args()
 
@@ -86,3 +122,8 @@ if __name__ == '__main__':
         off()
     elif args.action == 'daemon':
         daemon()
+    elif args.action == 'test':
+        print('Running tests the easy way:')
+        runner = unittest.TextTestRunner(stream=sys.stdout)
+        result = runner.run(unittest.makeSuite(TestImplementation))
+

@@ -3,23 +3,23 @@ try:
     import RPi.GPIO
 except ModuleNotFoundError:
     pass
-import argparse
 import os.path
+
+import argparse
 import logging
-import subprocess
 import re
+import subprocess
+import sys
 import unittest
 import unittest.mock
-import sys
 
 """
 command line testing
-$ raspi-gpio set 19 op dl
-$ raspi-gpio set 19 op dh
+pi@pascal:~ $ raspi-gpio set 19 op dl
+pi@pascal:~ $ raspi-gpio set 19 op dh
 
 pi@pascal:~ $ DISPLAY=:0 xscreensaver-command -watch
 UNBLANK Sun Oct  4 14:48:25 2020
-
 BLANK Sun Oct  4 14:48:37 2020
 ...or
 LOCK Tue Jan  5 14:16:38 2021
@@ -115,6 +115,10 @@ if __name__ == '__main__':
     logging.getLogger().handlers[0].setFormatter(
         logging.Formatter('%(asctime)s %(levelname)s %(message)s')
     )
+
+    if not os.path.isfile('/usr/bin/hyperpixel4-init'):
+        print('Do you really have hyperpixel4 installed in this system?')
+        sys.exit(-1)
 
     if args.action == 'on':
         on()

@@ -1,6 +1,6 @@
 Package: hyperpixel4-blu
 Architecture: armhf
-Version: 1.0-1
+Version: 1.0.0-1+testbuild0
 Maintainer: Santeri Toikka <santeri.toikka@iki.fi>
 Depends: python3 (>= 3.7)
 Description: hyperpixel4 backlight utilities for Raspberry Pi

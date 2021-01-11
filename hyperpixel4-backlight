@@ -62,6 +62,7 @@ def daemon():
         blank = r'^(BLANK|LOCK)+'
         while True:
             line = p.stdout.readline().decode('utf-8')
+            logging.debug(f'Got an event: {line}!')
             if not line:
                 break
 
@@ -130,4 +131,3 @@ if __name__ == '__main__':
         print('Running tests the easy way:')
         runner = unittest.TextTestRunner(stream=sys.stdout)
         result = runner.run(unittest.makeSuite(TestImplementation))
-

@@ -1,7 +1,0 @@
-#!/usr/bin/make -f
-%:
-	dh $@ --with systemd
-
-override_dh_installsystemd:
-    dh_installsystemd --name=hyperpixel4-shutdown-hack
-    dh_installsystemd --name=hyperpixel4-backlight

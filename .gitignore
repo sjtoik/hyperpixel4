@@ -1,3 +1,10 @@
 *.iml
 install.sh
-*deb
+*.deb
+*.build
+*.dsc
+*.tar.gz
+*.tar.xz
+*.build
+*.buildinfo
+*.changes

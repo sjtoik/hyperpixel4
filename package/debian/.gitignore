@@ -1,0 +1,7 @@
+hyperpixel4-blu
+.debhelper
+debhelper-build-stamp
+files
+*.debhelper.log
+*.substvars
+*.debhelper

@@ -1,0 +1,13 @@
+Source: hyperpixel4-blu
+Section: unknown
+Priority: optional
+Maintainer: Santeri Toikka <santeri.toikka@iki.fi>
+Build-Depends: debhelper (>=10)
+Standards-Version: 4.0.0
+Vcs-Git: https://github.com/sjtoik/hyperpixel4.git
+Vcs-Browser: https://github.com/sjtoik/hyperpixel4
+
+Package: hyperpixel4-blu
+Architecture: armhf
+Depends: python3 (>= 3.7)
+Description: hyperpixel4 backlight utilities for Raspberry Pi

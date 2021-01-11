@@ -19,3 +19,13 @@ jobs:
         run: |
           sudo apt update; sudo apt install -y debhelper build-essential
           make -C package build
+
+  test:
+    name: Code tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Run tests
+        run: |
+          ./hyperpixel4-backlight test

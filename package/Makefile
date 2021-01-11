@@ -1,8 +1,5 @@
+.PHONY: default
 default:
-
-.PHONY: build-source
-build-source:
-	dpkg-source -b
 
 .PHONY: build
 build:

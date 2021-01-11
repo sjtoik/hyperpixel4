@@ -76,10 +76,10 @@ def daemon():
 class TestImplementation(unittest.TestCase):
 
     def create_patch(self, name):
-         patcher = unittest.mock.patch(name)
-         thing = patcher.start()
-         self.addCleanup(patcher.stop)
-         return thing
+        patcher = unittest.mock.patch(name)
+        thing = patcher.start()
+        self.addCleanup(patcher.stop)
+        return thing
 
     def test_grepping(self):
         readline_tests = [
@@ -117,7 +117,7 @@ if __name__ == '__main__':
         logging.Formatter('%(asctime)s %(levelname)s %(message)s')
     )
 
-    if not os.path.isfile('/usr/bin/hyperpixel4-init'):
+    if not os.path.isfile('/usr/bin/hyperpixel4-init') and args.action != 'test':
         print('Do you really have hyperpixel4 installed in this system?')
         sys.exit(-1)
 

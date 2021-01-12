@@ -4,4 +4,5 @@
 
 override_dh_installsystemd:
 	dh_installsystemd --name=hyperpixel4-shutdown-hack
-	dh_installsystemd --name=hyperpixel4-backlight
+	dh_installsystemduser --name=hyperpixel4-backlight
+

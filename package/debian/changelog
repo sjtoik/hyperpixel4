@@ -1,5 +1,5 @@
-hyperpixel4-blu (1.0.4) UNRELEASED; urgency=medium
+hyperpixel4-blu (1.0.8) UNRELEASED; urgency=medium
 
-  * Revised restart policy
+  * A bit buggy release.
 
  -- Santeri Toikka <santeri.toikka@iki.fi>  Tue, 12 Jan 2021 13:37:00 +0200

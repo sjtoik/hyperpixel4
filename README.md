@@ -1,5 +1,17 @@
-# Hyperpixel4 project stuff
+# Hyperpixel4 backlight utilities
+A winter project to enable system integration with Hyperpixel4 screen and Raspberry Pi 4.
 
+
+## Installation hack
+There is a problem with debian packaging scripts for systemd that I haven't figured out yet.
+The packagin rules are misconfigured to enable systemd service delivery, but the scripts will not install the service for the user.
+You need to manually enable and start the watcher service.
+```
+systemctl --user enable hyperpixel4-backlight
+systemctl --user start hyperpixel4-backlight
+```
+
+## Background
 * store page: https://shop.pimoroni.com/products/hyperpixel-4?variant=12569485443155
 * pinout: https://pinout.xyz/pinout/hyperpixel4#
 * github: https://github.com/pimoroni/hyperpixel4
@@ -17,3 +29,6 @@ A systemd hack hyperpixel4-backlight.service will sort the problem as proposed [
 
 ## Notes
 * regex cheat sheet https://regexr.com/
+
+
+

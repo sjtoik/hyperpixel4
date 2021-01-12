@@ -58,29 +58,27 @@ def not_working():
 
 def daemon():
     logging.info('Starting to listen events in XScreenSaver')
-    errors = 0
-    with subprocess.Popen(['xscreensaver-command', '-watch'], stdout=subprocess.PIPE) as p:
+    with subprocess.Popen(['xscreensaver-command', '-watch'], stdout=subprocess.PIPE, stderr=subprocess.PIPE) as p:
         unblank = r'^UNBLANK.*'
         blank = r'^(BLANK|LOCK)+'
-        cant_open = r'.*can.t open display.*'
         while True:
             line = p.stdout.readline().decode('utf-8')
-            logging.debug(f'Got an event: {line}!')
             if not line:
                 break
-
-            logging.debug(line.strip())
-            if re.match(blank, line):
+            elif re.match(blank, line):
                 off()
             elif re.match(unblank, line):
                 on()
-            elif errors >= 5:
-                logging.info('Too many errors XScreenSaver. Quitting.')
-                sys.exit(-1)
-            elif re.match(cant_open, line):
-                logging.info('Display is not ready. Sleeping for 5 seconds.')
-                errors += 1
-                time.sleep(5)
+            print(line.strip())
+
+        line = p.stderr.readline().decode('utf-8')
+        if not line:
+            return
+        else:
+            print(f'STDERR: { line }')
+            logging.info('Display is not ready. Sleeping for 5 seconds.')
+            time.sleep(5)
+            sys.exit(-1)
 
 
 class TestImplementation(unittest.TestCase):
@@ -92,20 +90,27 @@ class TestImplementation(unittest.TestCase):
         return thing
 
     def test_grepping(self):
-        readline_tests = [
+        readline_stdout = [
             b'UNBLANK Sun Oct  4 14:48:25 2020',
             b'BLANK Sun Oct  4 14:48:37 2020',
             b'LOCK Tue Jan  5 14:16:38 2021',
+            b'',
+        ]
+
+        readline_stderr = [
             b'xscreensaver-command: can\'t open display :0.0',
             b'',
         ]
 
         mock_popen = self.create_patch('subprocess.Popen')
-        mock_popen.return_value.__enter__.return_value.stdout.readline.side_effect = readline_tests
+        mock_popen.return_value.__enter__.return_value.stdout.readline.side_effect = readline_stdout
+        mock_popen.return_value.__enter__.return_value.stderr.readline.side_effect = readline_stderr
         mock_off = self.create_patch('__main__.off')
         mock_on = self.create_patch('__main__.on')
+        mock_sys = self.create_patch('sys.exit')
 
         daemon()
+        assert mock_sys.call_count == 1
         assert mock_on.call_count == 1
         assert mock_off.call_count == 2
 

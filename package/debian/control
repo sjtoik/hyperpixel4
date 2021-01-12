@@ -9,5 +9,5 @@ Vcs-Browser: https://github.com/sjtoik/hyperpixel4
 
 Package: hyperpixel4-blu
 Architecture: armhf
-Depends: python3 (>= 3.7)
+Depends: python3 (>= 3.7), xscreensaver (>= 5.42)
 Description: hyperpixel4 backlight utilities for Raspberry Pi

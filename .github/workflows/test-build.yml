@@ -9,17 +9,6 @@ on:
       - main
 
 jobs:
-  build:
-    name: Test build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Build project # This would actually build your project, using zip for an example artifact
-        run: |
-          sudo apt update; sudo apt install -y debhelper build-essential
-          make -C package build
-
   test:
     name: Code tests
     runs-on: ubuntu-latest
@@ -29,3 +18,26 @@ jobs:
       - name: Run tests
         run: |
           ./hyperpixel4-backlight test
+
+  build:
+    name: Test build
+    runs-on: ubuntu-latest
+    outputs:
+      changelog: ${{ steps.get_info.outputs.changelog }}
+      version: ${{ steps.get_info.outputs.version }}
+      filename: ${{ steps.get_info.outputs.filename }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Build project # This would actually build your project, using zip for an example artifact
+        run: |
+          sudo apt update; sudo apt install -y debhelper build-essential
+          make -C package build
+      - name: Get info
+        id: get_info
+        run: |
+          echo "::set-output name=changelog::`cd package && dpkg-parsechangelog --show-field Version`"
+          echo "::set-output name=version::`cd package && dpkg-parsechangelog --show-field Changes`"
+          echo "::set-output name=filename::`ls *.deb | head -n 1`"
+
+  # TODO: figure out how version number, changelog and build artifacts can be outputted

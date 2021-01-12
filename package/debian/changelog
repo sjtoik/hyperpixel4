@@ -1,5 +1,5 @@
-hyperpixel4-blu (1.0) UNRELEASED; urgency=medium
+hyperpixel4-blu (1.0.1) UNRELEASED; urgency=medium
 
-  * Initial release.
+  * First packaging release 
 
- -- Santeri Toikka <santeri.toikka@iki.fi>  Tue, 05 Jan 2021 09:42:01 +0200
+ -- Santeri Toikka <santeri.toikka@iki.fi>  Tue, 12 Jan 2021 09:44:53 +0200

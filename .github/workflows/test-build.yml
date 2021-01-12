@@ -24,7 +24,6 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.get_version.outputs.version }}
-      changelog: ${{ steps.get_changelog.outputs.changelog }}
       filename: ${{ steps.get_filename.outputs.filename }}
     steps:
       - name: Checkout code
@@ -37,19 +36,24 @@ jobs:
         id: get_version
         run: |
           echo "::set-output name=version::`cd package && dpkg-parsechangelog --show-field Version`"
-      - name: Get changelog
-        id: get_changelog
-        run: |
-          echo "::set-output name=changelog::`cd package && dpkg-parsechangelog --show-field Changes`"
       - name: Get filename
         id: get_filename
         run: |
           echo "::set-output name=filename::`ls *.deb | head -n 1`"
+      - name: Dump changelog
+        id: get_changelog
+        run: |
+          cd package && dpkg-parsechangelog --show-field Changes > ${{ steps.get_filename.outputs.filename }}.changelog
       - uses: actions/upload-artifact@v2
         name: Upload artifact
         with:
           name: ${{ steps.get_filename.outputs.filename }}
           path: ./${{ steps.get_filename.outputs.filename }}
+      - uses: actions/upload-artifact@v2
+        name: Upload changelog
+        with:
+          name: ${{ steps.get_filename.outputs.filename }}.changelog
+          path: ./${{ steps.get_filename.outputs.filename }}.changelog
 
   release:
     name: Release the artifacts
@@ -58,6 +62,5 @@ jobs:
     steps:
       - name: Test output
         run: |
-          echo ${{needs.build.outputs.changelog}}
           echo ${{needs.build.outputs.version}}
           echo ${{needs.build.outputs.filename}}

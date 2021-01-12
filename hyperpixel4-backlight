@@ -10,6 +10,7 @@ import logging
 import re
 import subprocess
 import sys
+import time
 import unittest
 import unittest.mock
 
@@ -57,20 +58,30 @@ def not_working():
 
 def daemon():
     logging.info('Starting to listen events in XScreenSaver')
-    with subprocess.Popen(['xscreensaver-command', '-watch'], stdout=subprocess.PIPE) as p:
-        unblank = r'^UNBLANK.*'
-        blank = r'^(BLANK|LOCK)+'
-        while True:
-            line = p.stdout.readline().decode('utf-8')
-            logging.debug(f'Got an event: {line}!')
-            if not line:
-                break
+    try:
+        with subprocess.Popen(['xscreensaver-command', '-watch'], stdout=subprocess.PIPE) as p:
+            unblank = r'^UNBLANK.*'
+            blank = r'^(BLANK|LOCK)+'
+            cant_open = r'.*can.t open display.*'
+            while True:
+                line = p.stdout.readline().decode('utf-8')
+                logging.debug(f'Got an event: {line}!')
+                if not line:
+                    break
 
-            logging.debug(line.strip())
-            if re.match(blank, line):
-                off()
-            elif re.match(unblank, line):
-                on()
+                logging.debug(line.strip())
+                if re.match(blank, line):
+                    off()
+                elif re.match(unblank, line):
+                    on()
+                elif re.match(cant_open, line):
+                    raise ConnectionRefusedError
+    except ConnectionRefusedError:
+        logging.info('Display is not ready. Sleeping for 5 seconds.')
+        time.sleep(5)
+        daemon()
+    except StopIteration:
+        pass
 
 
 class TestImplementation(unittest.TestCase):
@@ -86,6 +97,7 @@ class TestImplementation(unittest.TestCase):
             b'UNBLANK Sun Oct  4 14:48:25 2020',
             b'BLANK Sun Oct  4 14:48:37 2020',
             b'LOCK Tue Jan  5 14:16:38 2021',
+            b'xscreensaver-command: can\'t open display :0.0'
             b'',
         ]
 

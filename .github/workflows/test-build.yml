@@ -47,6 +47,8 @@ jobs:
           echo "::set-output name=filename::`ls *.deb | head -n 1`"
 
   release:
+    name: Release for the artifacts
+    runs-on: ubuntu-latest
     steps:
       - name: Test output
         run: |

@@ -34,7 +34,7 @@ def init():
 
 def on():
     init()
-    RPi.GPIO.output(19, RPi.GPIO.HIHG)
+    RPi.GPIO.output(19, RPi.GPIO.HIGH)
 
 
 def off():
@@ -126,8 +126,11 @@ if __name__ == '__main__':
     elif args.action == 'off':
         off()
     elif args.action == 'daemon':
-        daemon()
+        try:
+            daemon()
+        except KeyboardInterrupt:
+            pass
     elif args.action == 'test':
-        print('Running tests the easy way:')
+        print('Running tests:')
         runner = unittest.TextTestRunner(stream=sys.stdout)
         result = runner.run(unittest.makeSuite(TestImplementation))

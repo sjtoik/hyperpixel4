@@ -1,12 +1,14 @@
 [Unit]
-Description=Listesn XScreenSaver for status changes in display activity and toggles Hyperpixel4 backlight accordingly
+Description=XScreenSaver status monitor
 ConditionPathExists=/usr/bin/hyperpixel4-init
 DefaultDependencies=no
 
 [Service]
-Type=exec
+Type=simple
 ExecStart=/usr/bin/hyperpixel4-backlight daemon
-Restart=always
+Restart=on-failure
+KillMode=process
+RestartSec=10
 
 [Install]
 WantedBy=multi-user.target

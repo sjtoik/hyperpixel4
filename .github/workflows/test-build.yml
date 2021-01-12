@@ -49,6 +49,7 @@ jobs:
   release:
     name: Release for the artifacts
     runs-on: ubuntu-latest
+    needs: build
     steps:
       - name: Test output
         run: |

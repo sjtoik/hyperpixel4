@@ -2,7 +2,7 @@
 try:
     import RPi.GPIO
 except ModuleNotFoundError:
-    pass
+    pass  # enables testing in GH
 import os.path
 
 import argparse
@@ -58,35 +58,34 @@ def not_working():
 
 def daemon():
     logging.info('Starting to listen events in XScreenSaver')
-    try:
-        with subprocess.Popen(['xscreensaver-command', '-watch'], stdout=subprocess.PIPE) as p:
-            unblank = r'^UNBLANK.*'
-            blank = r'^(BLANK|LOCK)+'
-            cant_open = r'.*can.t open display.*'
-            while True:
-                line = p.stdout.readline().decode('utf-8')
-                logging.debug(f'Got an event: {line}!')
-                if not line:
-                    break
+    errors = 0
+    with subprocess.Popen(['xscreensaver-command', '-watch'], stdout=subprocess.PIPE) as p:
+        unblank = r'^UNBLANK.*'
+        blank = r'^(BLANK|LOCK)+'
+        cant_open = r'.*can.t open display.*'
+        while True:
+            line = p.stdout.readline().decode('utf-8')
+            logging.debug(f'Got an event: {line}!')
+            if not line:
+                break
 
-                logging.debug(line.strip())
-                if re.match(blank, line):
-                    off()
-                elif re.match(unblank, line):
-                    on()
-                elif re.match(cant_open, line):
-                    raise ConnectionRefusedError
-    except ConnectionRefusedError:
-        logging.info('Display is not ready. Sleeping for 5 seconds.')
-        time.sleep(5)
-        daemon()
-    except StopIteration:
-        pass
+            logging.debug(line.strip())
+            if re.match(blank, line):
+                off()
+            elif re.match(unblank, line):
+                on()
+            elif errors >= 5:
+                logging.info('Too many errors XScreenSaver. Quitting.')
+                sys.exit(-1)
+            elif re.match(cant_open, line):
+                logging.info('Display is not ready. Sleeping for 5 seconds.')
+                errors += 1
+                time.sleep(5)
 
 
 class TestImplementation(unittest.TestCase):
 
-    def create_patch(self, name):
+    def create_patch(self, name) -> unittest.mock.MagicMock:
         patcher = unittest.mock.patch(name)
         thing = patcher.start()
         self.addCleanup(patcher.stop)
@@ -97,7 +96,7 @@ class TestImplementation(unittest.TestCase):
             b'UNBLANK Sun Oct  4 14:48:25 2020',
             b'BLANK Sun Oct  4 14:48:37 2020',
             b'LOCK Tue Jan  5 14:16:38 2021',
-            b'xscreensaver-command: can\'t open display :0.0'
+            b'xscreensaver-command: can\'t open display :0.0',
             b'',
         ]
 
@@ -126,7 +125,7 @@ if __name__ == '__main__':
     else:
         logging.basicConfig(level=logging.INFO)
     logging.getLogger().handlers[0].setFormatter(
-        logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+        logging.Formatter('%(message)s')
     )
 
     if not os.path.isfile('/usr/bin/hyperpixel4-init') and args.action != 'test':

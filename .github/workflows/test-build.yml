@@ -20,7 +20,7 @@ jobs:
           ./hyperpixel4-backlight test
 
   build:
-    name: Test build
+    name: Build the package
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.get_version.outputs.version }}
@@ -43,7 +43,7 @@ jobs:
       - name: Dump changelog
         id: get_changelog
         run: |
-          cd package && dpkg-parsechangelog --show-field Changes > ${{ steps.get_filename.outputs.filename }}.changelog
+          cd package && dpkg-parsechangelog --show-field Changes > ../${{ steps.get_filename.outputs.filename }}.changelog
       - uses: actions/upload-artifact@v2
         name: Upload artifact
         with:

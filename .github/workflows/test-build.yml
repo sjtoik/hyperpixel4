@@ -23,8 +23,8 @@ jobs:
     name: Test build
     runs-on: ubuntu-latest
     outputs:
-      changelog: ${{ steps.get_changelog.outputs.changelog }}
       version: ${{ steps.get_version.outputs.version }}
+      changelog: ${{ steps.get_changelog.outputs.changelog }}
       filename: ${{ steps.get_filename.outputs.filename }}
     steps:
       - name: Checkout code
@@ -33,21 +33,26 @@ jobs:
         run: |
           sudo apt update; sudo apt install -y debhelper build-essential
           make -C package build
-      - name: Get changelog
-        id: get_changelog
-        run: |
-          echo "::set-output name=changelog::`cd package && dpkg-parsechangelog --show-field Version`"
       - name: Get version
         id: get_version
         run: |
-          echo "::set-output name=version::`cd package && dpkg-parsechangelog --show-field Changes`"
+          echo "::set-output name=version::`cd package && dpkg-parsechangelog --show-field Version`"
+      - name: Get changelog
+        id: get_changelog
+        run: |
+          echo "::set-output name=changelog::`cd package && dpkg-parsechangelog --show-field Changes`"
       - name: Get filename
         id: get_filename
         run: |
           echo "::set-output name=filename::`ls *.deb | head -n 1`"
+      - uses: actions/upload-artifact@v2
+        name: Upload artifact
+        with:
+          name: ${{ steps.get_filename.outputs.filename }}
+          path: ./${{ steps.get_filename.outputs.filename }}
 
   release:
-    name: Release for the artifacts
+    name: Release the artifacts
     runs-on: ubuntu-latest
     needs: build
     steps:

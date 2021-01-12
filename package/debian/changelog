@@ -1,5 +1,5 @@
-hyperpixel4-blu (1.0.3) UNRELEASED; urgency=medium
+hyperpixel4-blu (1.0.4) UNRELEASED; urgency=medium
 
-  * Attempting to fix bugs in startup
+  * Revised restart policy
 
- -- Santeri Toikka <santeri.toikka@iki.fi>  Tue, 12 Jan 2021 11:36:32 +0200
+ -- Santeri Toikka <santeri.toikka@iki.fi>  Tue, 12 Jan 2021 13:37:00 +0200

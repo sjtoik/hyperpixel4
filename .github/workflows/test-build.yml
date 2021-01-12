@@ -23,21 +23,33 @@ jobs:
     name: Test build
     runs-on: ubuntu-latest
     outputs:
-      changelog: ${{ steps.get_info.outputs.changelog }}
-      version: ${{ steps.get_info.outputs.version }}
-      filename: ${{ steps.get_info.outputs.filename }}
+      changelog: ${{ steps.get_changelog.outputs.changelog }}
+      version: ${{ steps.get_version.outputs.version }}
+      filename: ${{ steps.get_filename.outputs.filename }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Build project # This would actually build your project, using zip for an example artifact
+      - name: Build project
         run: |
           sudo apt update; sudo apt install -y debhelper build-essential
           make -C package build
-      - name: Get info
-        id: get_info
+      - name: Get changelog
+        id: get_changelog
         run: |
           echo "::set-output name=changelog::`cd package && dpkg-parsechangelog --show-field Version`"
+      - name: Get version
+        id: get_version
+        run: |
           echo "::set-output name=version::`cd package && dpkg-parsechangelog --show-field Changes`"
+      - name: Get filename
+        id: get_filename
+        run: |
           echo "::set-output name=filename::`ls *.deb | head -n 1`"
 
-  # TODO: figure out how version number, changelog and build artifacts can be outputted
+  release:
+    steps:
+      - name: Test output
+        run: |
+          echo ${{needs.build.outputs.changelog}}
+          echo ${{needs.build.outputs.version}}
+          echo ${{needs.build.outputs.filename}}

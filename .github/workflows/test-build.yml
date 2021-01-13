@@ -64,3 +64,5 @@ jobs:
         run: |
           echo ${{needs.build.outputs.version}}
           echo ${{needs.build.outputs.filename}}
+
+      #TODO: figure out how to release

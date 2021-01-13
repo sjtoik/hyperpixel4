@@ -1,13 +1,13 @@
-name: .deb test build
-
+name: .deb release build and upload
 on:
   push:
     branches:
       - main
-  pull_request:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+**'
+  pull_reguest:
     branches:
       - main
-
 jobs:
   test:
     name: Code tests
@@ -59,10 +59,42 @@ jobs:
     name: Release the artifacts
     runs-on: ubuntu-latest
     needs: build
+    if:
+      push:
+        tags:
+          - '[0-9]+.[0-9]+.[0-9]+**'
+
     steps:
-      - name: Test output
+      - name: Test the output
         run: |
           echo ${{needs.build.outputs.version}}
           echo ${{needs.build.outputs.filename}}
+          echo 'github ref: ${{ github.ref }}'
 
-      #TODO: figure out how to release
+  release2:
+    name: Release the package
+    runs-on: ubuntu-20.04
+    if: false
+    steps:
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            Release generated from tag push event.
+          draft: false
+          prerelease: false
+      - name: Upload Release Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./my-artifact.zip
+          asset_name: my-artifact.zip
+          asset_content_type: application/zip

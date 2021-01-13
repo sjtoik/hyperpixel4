@@ -59,7 +59,7 @@ jobs:
     name: Release the artifacts
     runs-on: ubuntu-latest
     needs: [build, test]
-    if: starsWith('refs/tags', github.ref)
+    if: startsWith('refs/tags', github.ref)
     steps:
       - name: Test the output
         run: |
